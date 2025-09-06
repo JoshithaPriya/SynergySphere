@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@clerk/nextjs": "^6.31.9",
+    "firebase": "^12.2.1"
+  }
+}

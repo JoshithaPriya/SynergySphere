@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
+import type React from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Footer } from "@/components/footer";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase"; // ✅ import Firebase auth
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -18,46 +18,49 @@ export default function SignUpPage() {
     lastName: "",
     email: "",
     password: "",
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // ✅ Call Firebase signup
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
 
-      if (formData.firstName && formData.lastName && formData.email && formData.password) {
-        console.log("Signup successful:", formData.email)
-        router.push("/dashboard")
-      } else {
-        alert("Please fill in all fields")
-      }
-    } catch (error) {
-      console.error("Signup error:", error)
-      alert("Signup failed. Please try again.")
+      console.log("Firebase signup success:", userCredential.user);
+
+      // ✅ Redirect to dashboard
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Firebase signup error:", error);
+      alert(error.message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-    }))
-  }
+    }));
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Create an account
+            </CardTitle>
             <CardDescription className="text-center">
               Enter your details to get started with SynergySphere
             </CardDescription>
@@ -137,8 +140,7 @@ export default function SignUpPage() {
           </CardContent>
         </Card>
       </main>
-
       <Footer />
     </div>
-  )
+  );
 }
